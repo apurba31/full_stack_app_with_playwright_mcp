@@ -1,0 +1,52 @@
+# Java / Gradle / Maven
+target/
+build/
+.gradle/
+.mvn/wrapper/maven-wrapper.jar
+*.class
+*.jar
+!gradle-wrapper.jar
+!maven-wrapper.jar
+hs_err_pid*
+replay_pid*
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.iws
+*.ipr
+.project
+.classpath
+.settings/
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+coverage/
+.npm/
+.eslintcache
+
+# Env
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Test
+test-results/
+playwright-report/
+playwright/.cache/
+
+# Generated proto sources
+**/generated/
+**/generated-sources/
