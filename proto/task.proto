@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package fullstack.task.v1;
+
+option java_multiple_files = true;
+option java_package = "com.fullstack.app.grpc.proto";
+option java_outer_classname = "TaskProto";
+
+service TaskService {
+  rpc GetTask(GetTaskRequest) returns (Task);
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+  rpc CreateTask(CreateTaskRequest) returns (Task);
+}
+
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TODO = 1;
+  IN_PROGRESS = 2;
+  DONE = 3;
+}
+
+enum TaskPriority {
+  TASK_PRIORITY_UNSPECIFIED = 0;
+  LOW = 1;
+  MEDIUM = 2;
+  HIGH = 3;
+}
+
+message Task {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  TaskStatus status = 4;
+  TaskPriority priority = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message ListTasksRequest {
+  TaskStatus status = 1;
+  int32 page_size = 2;
+  int32 page_number = 3;
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+  int64 total = 2;
+}
+
+message CreateTaskRequest {
+  string title = 1;
+  string description = 2;
+  TaskPriority priority = 3;
+}

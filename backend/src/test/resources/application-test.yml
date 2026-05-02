@@ -1,0 +1,36 @@
+server:
+  port: 0
+
+spring:
+  datasource:
+    url: jdbc:h2:mem:tasks;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;CASE_INSENSITIVE_IDENTIFIERS=TRUE;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        jdbc:
+          time_zone: UTC
+  flyway:
+    enabled: false
+  kafka:
+    listener:
+      missing-topics-fatal: false
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+grpc:
+  server:
+    port: 0
+    in-process-name: test-grpc-server
+
+logging:
+  level:
+    root: WARN
+    com.fullstack.app: INFO
