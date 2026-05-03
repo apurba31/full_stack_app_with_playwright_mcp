@@ -37,7 +37,7 @@ public class PlaywrightService {
                         new Page.ScreenshotOptions().setFullPage(request.fullPage())
                 );
                 String base64 = Base64.getEncoder().encodeToString(screenshotBytes);
-                Page.ViewportSize viewport = page.viewportSize();
+                var viewport = page.viewportSize();
                 int width = viewport != null ? viewport.width : DEFAULT_VIEWPORT_WIDTH;
                 int height = viewport != null ? viewport.height : DEFAULT_VIEWPORT_HEIGHT;
 
