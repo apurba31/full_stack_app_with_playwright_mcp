@@ -36,7 +36,8 @@ import static org.assertj.core.api.Assertions.assertThat;
         "spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration,"
                 + "org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration,"
                 + "org.springframework.boot.autoconfigure.data.jpa.JpaRepositoriesAutoConfiguration",
-        "grpc.server.port=-1"
+        "grpc.server.port=-1",
+        "grpc.server.in-process-name=task-audit-consumer-test-grpc"
 })
 @ActiveProfiles("test")
 class TaskAuditConsumerTest {
