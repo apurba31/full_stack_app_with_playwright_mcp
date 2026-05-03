@@ -5,6 +5,9 @@ import com.fullstack.app.domain.TaskStatus;
 import com.fullstack.app.dto.CreateTaskRequest;
 import com.fullstack.app.dto.TaskDto;
 import com.fullstack.app.exception.TaskNotFoundException;
+import com.fullstack.app.dto.UpdateTaskRequest;
+import com.fullstack.app.grpc.proto.DeleteTaskRequest;
+import com.fullstack.app.grpc.proto.DeleteTaskResponse;
 import com.fullstack.app.grpc.proto.GetTaskRequest;
 import com.fullstack.app.grpc.proto.ListTasksRequest;
 import com.fullstack.app.grpc.proto.ListTasksResponse;
@@ -77,6 +80,45 @@ public class TaskGrpcService extends TaskServiceGrpc.TaskServiceImplBase {
             responseObserver.onCompleted();
         } catch (IllegalArgumentException ex) {
             responseObserver.onError(Status.INVALID_ARGUMENT.withDescription(ex.getMessage())
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void updateTask(com.fullstack.app.grpc.proto.UpdateTaskRequest request,
+                           StreamObserver<Task> responseObserver) {
+        try {
+            UUID id = UUID.fromString(request.getId());
+            TaskStatus mappedStatus = mapFromProto(request.getStatus());
+            UpdateTaskRequest dtoReq = new UpdateTaskRequest(
+                    request.getTitle(),
+                    request.getDescription().isEmpty() ? null : request.getDescription(),
+                    mappedStatus == null ? TaskStatus.TODO : mappedStatus,
+                    mapFromProto(request.getPriority())
+            );
+            TaskDto updated = taskService.update(id, dtoReq);
+            responseObserver.onNext(toProto(updated));
+            responseObserver.onCompleted();
+        } catch (TaskNotFoundException ex) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(ex.getMessage()).asRuntimeException());
+        } catch (IllegalArgumentException ex) {
+            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Invalid id: " + request.getId())
+                    .asRuntimeException());
+        }
+    }
+
+    @Override
+    public void deleteTask(DeleteTaskRequest request,
+                           StreamObserver<DeleteTaskResponse> responseObserver) {
+        try {
+            UUID id = UUID.fromString(request.getId());
+            taskService.delete(id);
+            responseObserver.onNext(DeleteTaskResponse.newBuilder().setSuccess(true).build());
+            responseObserver.onCompleted();
+        } catch (TaskNotFoundException ex) {
+            responseObserver.onError(Status.NOT_FOUND.withDescription(ex.getMessage()).asRuntimeException());
+        } catch (IllegalArgumentException ex) {
+            responseObserver.onError(Status.INVALID_ARGUMENT.withDescription("Invalid id: " + request.getId())
                     .asRuntimeException());
         }
     }

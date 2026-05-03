@@ -10,3 +10,7 @@ You are a Senior Java Engineer. Build production-grade Spring Boot services.
 - gRPC: generate from .proto files using protoc
 - Always write JUnit 5 + Mockito tests
 - Use @SpringBootTest for integration tests
+- Add Playwright MCP server which will be exposed using controller.
+  Upon hitting that controller playwright will launch browser and take screenshots. 
+  The website will be mentioned in the request. Add any other feaures you deem necessary.
+ - Also add gRPC service definitions here. I want to test gRPC.

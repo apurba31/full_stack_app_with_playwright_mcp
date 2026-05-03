@@ -138,6 +138,13 @@
             <version>1.3.2</version>
         </dependency>
 
+        <!-- Playwright -->
+        <dependency>
+            <groupId>com.microsoft.playwright</groupId>
+            <artifactId>playwright</artifactId>
+            <version>1.44.0</version>
+        </dependency>
+
         <!-- Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -281,6 +288,7 @@
                             <excludes>
                                 <exclude>com/fullstack/app/grpc/proto/**</exclude>
                                 <exclude>com/fullstack/app/BackendApplication.class</exclude>
+                                <exclude>com/fullstack/app/playwright/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>

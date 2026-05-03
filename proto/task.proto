@@ -10,6 +10,8 @@ service TaskService {
   rpc GetTask(GetTaskRequest) returns (Task);
   rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
   rpc CreateTask(CreateTaskRequest) returns (Task);
+  rpc UpdateTask(UpdateTaskRequest) returns (Task);
+  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse);
 }
 
 enum TaskStatus {
@@ -55,4 +57,20 @@ message CreateTaskRequest {
   string title = 1;
   string description = 2;
   TaskPriority priority = 3;
+}
+
+message UpdateTaskRequest {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  TaskStatus status = 4;
+  TaskPriority priority = 5;
+}
+
+message DeleteTaskRequest {
+  string id = 1;
+}
+
+message DeleteTaskResponse {
+  bool success = 1;
 }

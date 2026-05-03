@@ -1,6 +1,8 @@
 package com.fullstack.app.grpc;
 
 import com.fullstack.app.grpc.proto.CreateTaskRequest;
+import com.fullstack.app.grpc.proto.DeleteTaskRequest;
+import com.fullstack.app.grpc.proto.DeleteTaskResponse;
 import com.fullstack.app.grpc.proto.GetTaskRequest;
 import com.fullstack.app.grpc.proto.ListTasksRequest;
 import com.fullstack.app.grpc.proto.ListTasksResponse;
@@ -8,6 +10,7 @@ import com.fullstack.app.grpc.proto.Task;
 import com.fullstack.app.grpc.proto.TaskPriority;
 import com.fullstack.app.grpc.proto.TaskServiceGrpc;
 import com.fullstack.app.grpc.proto.TaskStatus;
+import com.fullstack.app.grpc.proto.UpdateTaskRequest;
 import com.fullstack.app.kafka.KafkaTopics;
 import com.fullstack.app.repository.TaskRepository;
 import io.grpc.ManagedChannel;
@@ -122,5 +125,85 @@ class TaskGrpcServiceTest {
         ListTasksResponse byStatus = stub.listTasks(ListTasksRequest.newBuilder()
                 .setStatus(TaskStatus.DONE).setPageSize(10).build());
         assertThat(byStatus.getTotal()).isEqualTo(0);
+    }
+
+    @Test
+    void updateTaskChangesFieldsAndReturnsUpdatedTask() {
+        Task created = stub.createTask(CreateTaskRequest.newBuilder()
+                .setTitle("Original")
+                .setPriority(TaskPriority.LOW)
+                .build());
+
+        Task updated = stub.updateTask(UpdateTaskRequest.newBuilder()
+                .setId(created.getId())
+                .setTitle("Updated Title")
+                .setDescription("Updated Desc")
+                .setStatus(TaskStatus.IN_PROGRESS)
+                .setPriority(TaskPriority.HIGH)
+                .build());
+
+        assertThat(updated.getId()).isEqualTo(created.getId());
+        assertThat(updated.getTitle()).isEqualTo("Updated Title");
+        assertThat(updated.getDescription()).isEqualTo("Updated Desc");
+        assertThat(updated.getStatus()).isEqualTo(TaskStatus.IN_PROGRESS);
+        assertThat(updated.getPriority()).isEqualTo(TaskPriority.HIGH);
+    }
+
+    @Test
+    void updateTaskUnknownIdReturnsNotFound() {
+        assertThatThrownBy(() -> stub.updateTask(UpdateTaskRequest.newBuilder()
+                .setId("00000000-0000-0000-0000-000000000000")
+                .setTitle("X")
+                .setStatus(TaskStatus.TODO)
+                .setPriority(TaskPriority.MEDIUM)
+                .build()))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("NOT_FOUND");
+    }
+
+    @Test
+    void updateTaskInvalidIdReturnsInvalidArgument() {
+        assertThatThrownBy(() -> stub.updateTask(UpdateTaskRequest.newBuilder()
+                .setId("not-a-uuid")
+                .setTitle("X")
+                .build()))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("INVALID_ARGUMENT");
+    }
+
+    @Test
+    void deleteTaskRemovesTaskSuccessfully() {
+        Task created = stub.createTask(CreateTaskRequest.newBuilder()
+                .setTitle("ToDelete")
+                .setPriority(TaskPriority.MEDIUM)
+                .build());
+
+        DeleteTaskResponse response = stub.deleteTask(DeleteTaskRequest.newBuilder()
+                .setId(created.getId())
+                .build());
+
+        assertThat(response.getSuccess()).isTrue();
+        assertThatThrownBy(() -> stub.getTask(GetTaskRequest.newBuilder()
+                .setId(created.getId()).build()))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("NOT_FOUND");
+    }
+
+    @Test
+    void deleteTaskUnknownIdReturnsNotFound() {
+        assertThatThrownBy(() -> stub.deleteTask(DeleteTaskRequest.newBuilder()
+                .setId("00000000-0000-0000-0000-000000000000")
+                .build()))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("NOT_FOUND");
+    }
+
+    @Test
+    void deleteTaskInvalidIdReturnsInvalidArgument() {
+        assertThatThrownBy(() -> stub.deleteTask(DeleteTaskRequest.newBuilder()
+                .setId("bad-id")
+                .build()))
+                .isInstanceOf(StatusRuntimeException.class)
+                .hasMessageContaining("INVALID_ARGUMENT");
     }
 }
